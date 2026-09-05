@@ -1,0 +1,41 @@
+name: Build HYBRID ATHLETE APK
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - main
+
+jobs:
+  build-apk:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v6
+
+      - name: Setup Java
+        uses: actions/setup-java@v5
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      - name: Extract Android project
+        run: |
+          mkdir android-project
+          unzip -q HYBRID_ATHLETE_Android_Studio_Project.zip -d android-project
+
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@v6
+        with:
+          gradle-version: '8.9'
+
+      - name: Build APK
+        working-directory: android-project
+        run: gradle :app:assembleDebug
+
+      - name: Upload APK
+        uses: actions/upload-artifact@v6
+        with:
+          name: HYBRID-ATHLETE-APK
+          path: android-project/app/build/outputs/apk/debug/app-debug.apk
